@@ -1,4 +1,3 @@
-
 from statsmodels.tsa.arima_model import ARIMA
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -13,6 +12,7 @@ import itertools
 import warnings
 import dateutil
 import math
+import json
 
 def readData(pathData):
     df = pd.read_csv(pathData)
@@ -129,8 +129,13 @@ def main(pathData):
   df = readData(pathData)
   df = coutMenu(df)
   df2 = transformDf(df)
-  # print(df2.head())
   predictions, rmse = arimaModel(df2)
-  # print('Prediksi : ', predictions)
-  # print('RMSE     : ', rmse)
-  return predictions, rmse
+  predictions = predictions.tolist()
+  # print(type(predictions))
+  data = {
+    "predictions" : predictions,
+    "rmse"        : rmse
+  }
+
+  jsonData = json.dumps(data)
+  return jsonData

@@ -11,9 +11,15 @@
         <h1>Predict Page</h1>
         <h2>RMSE : {{ rmse }}</h2>
         <h3>Prediction for 7 days Later : </h3>
-        {% for pred in preds%}
-        {{ pred }} <br />
-        {% endfor %}
+        <h4>{{ length }}</h4>
+        <p>
+            {% for pred in preds %}
+                {{ pred }} <br />
+            {% endfor %}
+        </p>
     </center> 
+    <div class="wrapper">
+        <a href="/" class="button">Back</a>
+    </div>
 </body>
 </html>
