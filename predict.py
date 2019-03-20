@@ -8,7 +8,6 @@ import os
 def predict(dictModels, df2):
   listResult = []
   for column in df2:
-  # for model in dictModels:
     modelName = dictModels[column]
     model = pickle.load(open('models/'+modelName,'rb'))
     predictions = model.predict(start=len(df2[column].values)-7, end=len(df2[column].values)-1)
@@ -17,6 +16,7 @@ def predict(dictModels, df2):
       rmse = 0
 
     predictions = predictions.tolist()
+    predictions = [0 if i < 0 else i for i in predictions]
     data = {
       "menu"        : column,
       "predictions" : predictions,
@@ -37,6 +37,8 @@ def forecast(dictModels, df2):
     predictions = model.forecast(7)
 
     predictions = predictions.tolist()
+    predictions = [0 if i < 0 else i for i in predictions]
+    predictions = [math.floor(i) if i-math.floor(i) < 0.5 else math.ceil(i) for i in predictions]
     data = {
       "menu"        : column,
       "predictions" : predictions,
