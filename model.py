@@ -4,6 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn import metrics  
 from pandas import datetime
+from datetime import date
 from math import sqrt
 import statsmodels.api as sm
 import pandas as pd
@@ -70,7 +71,7 @@ def transformDf(df):
       if i_menu in oneDateColumn:
         df2.loc[i_menu].at[column] = oneDate.iloc[0][i_menu]
 
-  return df2
+  return df2.T
 
 def min_pdq(train, pdq):
   params = {}
@@ -90,11 +91,11 @@ def min_pdq(train, pdq):
 
   return minimum_pdq
 
-def arimaModel(df):
-  # result = {}
-  df2 = df.copy()
-  df2 = df2.T
-  df2 = df2.iloc[:,:3]
+def arimaModel(df2):
+  models = {}
+  # df2 = df.copy()
+  # df2 = df2.T
+  # df2 = df2.iloc[:,:3]
 
   for num, column in enumerate(df2):
     # print('No. Product : ', column)
@@ -103,13 +104,14 @@ def arimaModel(df):
     
     X = df2[column].values
     train = X[0:len(df2[column].values)-7]
-    predictions = []
     
+    # ========= A R I M A ==========
     # p=d=q=range(0,5)
     # pdq = list(itertools.product(p,d,q))
     # use_pdq = min_pdq(train, pdq)
     # print(use_pdq)
-    
+    # ==============================
+
     # ========= S A R I M A X ============
     mod = sm.tsa.statespace.SARIMAX(
       train, 
@@ -118,8 +120,13 @@ def arimaModel(df):
       enforce_stationarity=False,
       enforce_invertibility=False)
     model_fit = mod.fit(disp=0)
-    
-    return model_fit
+    # ====================================
+
+    fileName = str(date.today())+'('+column+')'+'.pkl'
+    pickle.dump(model_fit, open('models/'+fileName,'wb'))
+    models[column] = fileName
+  pickle.dump(models, open('models/dictModels.pkl','wb'))
+  return models
 
 def proccessData(pathData):
     warnings.filterwarnings('ignore')

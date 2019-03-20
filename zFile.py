@@ -4,6 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn import metrics  
 from pandas import datetime
+from datetime import date
 from math import sqrt
 import statsmodels.api as sm
 import pandas as pd
@@ -11,6 +12,7 @@ import numpy as np
 import itertools
 import warnings
 import dateutil
+import pickle
 import math
 import json
 
@@ -69,7 +71,7 @@ def transformDf(df):
       if i_menu in oneDateColumn:
         df2.loc[i_menu].at[column] = oneDate.iloc[0][i_menu]
 
-  return df2
+  return df2.T
 
 def min_pdq(train, pdq):
   params = {}
@@ -89,14 +91,14 @@ def min_pdq(train, pdq):
 
   return minimum_pdq
 
-def arimaModel(df):
-  # result = {}
-  df2 = df.copy()
-  df2 = df2.T
-  df2 = df2.iloc[:,:3]
+def arimaModel(df2):
+  models = {}
+  # df2 = df.copy()
+  # df2 = df2.T
+  # df2 = df2.iloc[:,:3]
 
   for num, column in enumerate(df2):
-    # print('No. Product : ', column)
+    print('No. Product : ', num, column, type(column))
     sales_diff = df2[column].diff(periods=1)  # integreted order 1
     sales_diff = sales_diff[1:]
     
@@ -121,18 +123,23 @@ def arimaModel(df):
     
     predictions = model_fit.predict(start=len(df2[column].values)-7, end=len(df2[column].values)-1)
     rmse = sqrt(mean_squared_error(df2[column][len(df2[column].values)-7:].values, predictions))
-    
+
     # if column not in result:
     #   result[column] = ', '.join(map(str, predictions)) 
     # print(predictions)
-    return predictions, rmse
+
+    fileName = str(date.today())+'('+column+')'+'.pkl'
+    pickle.dump(model_fit, open('models/'+fileName,'wb'))
+    models[column] = fileName
+  return predictions, rmse, models
+  # return predictions, rmse
 
 def main(pathData):
   warnings.filterwarnings('ignore')
   df = readData(pathData)
   df = coutMenu(df)
   df2 = transformDf(df)
-  predictions, rmse = arimaModel(df2)
+  predictions, rmse, models = arimaModel(df2)
   predictions = predictions.tolist()
   # print(type(predictions))
   data = {
@@ -156,3 +163,8 @@ def forecast(model):
 
   jsonData = json.dumps(data)
   return jsonData
+
+pathData = 'data/dataset.csv'
+hasil = main(pathData)
+
+print(hasil)

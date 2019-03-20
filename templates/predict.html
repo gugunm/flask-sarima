@@ -9,12 +9,17 @@
 <body>
     <center>
         <h1>Predict Page</h1>
-        <h2>RMSE : {{ rmse }}</h2>
+        <!-- <h2>RMSE : {{ rmse }}</h2>
         <h3>Prediction for 7 days Later : </h3>
         <h4>{{ length }}</h4>
         <p>
             {% for pred in preds %}
                 {{ pred }} <br />
+            {% endfor %}
+        </p> -->
+        <p>
+            {% for pred in data["data"] %}
+                {{ pred["menu"] }} : {{ pred["rmse"] }} <br/>
             {% endfor %}
         </p>
     </center> 
