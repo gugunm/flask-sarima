@@ -97,7 +97,7 @@ def arimaModel(df2):
   # df2 = df2.T
   # df2 = df2.iloc[:,:3]
 
-  for num, column in enumerate(df2):
+  for column in df2:
     # print('No. Product : ', column)
     sales_diff = df2[column].diff(periods=1)  # integreted order 1
     sales_diff = sales_diff[1:]
